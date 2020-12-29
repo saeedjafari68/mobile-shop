@@ -28,9 +28,9 @@ class Cart extends React.Component {
 
 
     }
-    this.Payment = this.Payment.bind(this);
     this.AfterPayment = this.AfterPayment.bind(this);
     this.VerifyAndPayment = this.VerifyAndPayment.bind(this);
+    this.Payment = this.Payment.bind(this);
 
     
 
