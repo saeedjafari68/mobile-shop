@@ -14,7 +14,7 @@ import Swiper from 'react-native-swiper'
 
 //Drawer.defaultProps.styles.mainOverlay.elevation = 0;   
 let cards = [];      
-function Item({ title }) {
+function Item({ title }) {       
   return (
     <View style={{margin:5}}>
       <Button ><Text  style={styles.Text}>{title}</Text></Button>

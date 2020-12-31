@@ -75,7 +75,7 @@ class Products extends React.Component {
     let that = this;
     this.setState({
       visibleLoader: true
-    })
+    }) 
     AsyncStorage.getItem('api_token').then((value) => this.setState({
       api_token: value
     }))
@@ -191,13 +191,15 @@ class Products extends React.Component {
       let ECallBack = function (error) {
         alert(error)
       }
+      console.warn(response.data.authData.userId)
       let param = {
-        PId: that.state.id,
+        PId: that.state.PID,
+        PDId: that.state.id,
         Number: that.state.Count,
         UId: response.data.authData.userId,
         Price: that.state.Products[0].price - ((that.state.Products[0].price * that.state.Products[0].off) / 100),
         Status: "0",
-        Type: "insert",
+        Type: "insert", 
         token: that.state.api_token
       }
       that.Server.send("https://marketapi.sarvapps.ir/MainApi/ManageCart", param, SCallBack, ECallBack)
@@ -246,8 +248,10 @@ class Products extends React.Component {
 
     let SCallBack = function (response) {
       var resp = response.data.result[0];
+      console.warn(resp.product_id);
       that.setState({
         Products: response.data.result,
+        PID: resp.product_id,
         Seller: response.data.Seller || [],
         rating: response.data.extra.raiting[0] ? response.data.extra.raiting[0].point : 0,
         img1: resp.fileUploaded1 != "" ? resp.fileUploaded1.split("public")[1] : null,
@@ -258,10 +262,10 @@ class Products extends React.Component {
         visibleLoader: false
       })
       that.getComments();
-      //   alert(that.state.Products.length)  
+      //   alert(that.state.Products.length)      
     }
     let ECallBack = function (error) {
-      alert(error)
+      alert(error)   
     }
     let param = {
       id: this.state.id,

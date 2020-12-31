@@ -8,6 +8,7 @@ import { Col, Row, Grid } from 'react-native-easy-grid';
 import {AsyncStorage} from 'react-native';
 import HeaderBox from './HeaderBox.js'
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Dialog, { DialogContent } from 'react-native-popup-dialog';
 
 class Cart extends React.Component {   
   constructor(props){   
@@ -168,15 +169,15 @@ class Cart extends React.Component {
           return;
       let ItemCount = this.state.ItemCount;
       ItemCount[I] = parseInt(ItemCount[I])+parseInt(C)+"";
-      console.warn(ItemCount[I])
+      console.warn(C=="0" ? C : ItemCount[I])
       
       let that = this;
       let param={  
               product_id :  product_id,
-              user_id : this.state.UserId,
+              user_id : this.state.UserId,  
               number:C=="0" ? C : ItemCount[I]
         };
-
+  
         let SCallBack = function(response){
                 that.getCartItems();
          };
@@ -184,11 +185,11 @@ class Cart extends React.Component {
                 alert(error)
         }
         this.Server.send("https://marketapi.sarvapps.ir/MainApi/changeCart",param,SCallBack,ECallBack)
-
+   
   }
   ConvertNumToFarsi(text){
     var id= ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
-    if(!text)
+    if(!text)  
       return text;
     return text.toString().replace(/[0-9]/g, function(w){   
      return id[+w]
@@ -212,8 +213,9 @@ class Cart extends React.Component {
 
         let SCallBack = function(response){
                 let lastPrice=0, 
-                    CartNumber=0,
-                    ItemCount=[];
+                    CartNumber=0,   
+                    ItemCount=[];  
+                console.warn(response.data.result)    
                 response.data.result.map((res,index) =>{
                     lastPrice+=res.number*res.price;
                     CartNumber+=parseInt(res.number);
@@ -221,7 +223,7 @@ class Cart extends React.Component {
 
                 })     
                 AsyncStorage.setItem('CartNumber',CartNumber.toString());
-                that.setState({
+                that.setState({      
                     lastPrice:parseInt(lastPrice),
                     GridData:response.data.result,
                     CartNumber:CartNumber,
@@ -247,9 +249,9 @@ class Cart extends React.Component {
     <Container>
       <HeaderBox navigation={this.props.navigation} title={'سبد خرید'} goBack={true} NewCartNumber={this.state.CartNumber} />
         
-        <Content style={{marginBottom:40}}>   
+        <Content style={{marginBottom:40}}>       
           {this.state.GoToBank &&
-          <View style={{position:'absolute',width:'100%',zIndex:2}}>
+          <View style={{position:'absolute',width:'100%',zIndex:2,display:'none'}}>
            <View style={{backgroundColor:'#fff',marginTop:100,height:180,margin:30,borderRadius:5,borderWidth:1,borderColor:'#ccc',borderStyle:'solid'}}>
            <View style={{paddingTop:10}}>
               <Text style={{fontFamily:'IRANYekanMobileLight',textAlign:'center',fontSize:13}}>در حال اتصال به بانک</Text>   
@@ -267,7 +269,7 @@ class Cart extends React.Component {
                 </Button>
            </View>
              </View> 
-          </View>
+          </View>     
 
           }
         <View style={{backgroundColor:'#ba6dc7',padding:10,width:'100%'}}>
@@ -340,18 +342,18 @@ class Cart extends React.Component {
           
           <Row style={{borderWidth: 1,borderColor: '#d6d7da'}}>
     <Col style={{verticalAlign:'middle',borderRightWidth: 1,borderColor: '#d6d7da',alignSelf:'center'}}>
-    <TouchableOpacity  onPress={() => this.ChangeCount("0",index,item.products[0]._id)}><Icon name='close' style={{fontSize:30,textAlign:'center',color:'red'}}  /></TouchableOpacity>
+    <TouchableOpacity  onPress={() => this.ChangeCount("0",index,item.product_detail_id)}><Icon name='close' style={{fontSize:30,textAlign:'center',color:'red'}}  /></TouchableOpacity>
       
     </Col>      
    <Col style={{borderRightWidth: 0.5,borderColor: '#eee',alignSelf:'center'}}>
   <Grid style={{marginBottom:10,marginTop:20}}>
     <Row>
       <Col>
-          <TouchableOpacity onPress={() => this.ChangeCount(+1,index,item.products[0]._id)} ><Text style={{fontFamily:"IRANYekanMobileLight",fontSize:30,textAlign:'center'}}><Ionicons name="ios-arrow-dropup-circle" style={{ fontSize: 30, color: 'green' }} /></Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => this.ChangeCount(+1,index,item.product_detail_id)} ><Text style={{fontFamily:"IRANYekanMobileLight",fontSize:30,textAlign:'center'}}><Ionicons name="ios-arrow-dropup-circle" style={{ fontSize: 30, color: 'green' }} /></Text></TouchableOpacity>
       </Col> 
       </Row>
       <Row style={{marginTop:15}}> 
-      <Col>
+      <Col>   
           <View>
             <Text style={{fontFamily:"IRANYekanMobileLight",fontSize:30,textAlign:'center',color:'#333'}}>
               {this.ConvertNumToFarsi(this.state.ItemCount[index])}
@@ -361,7 +363,7 @@ class Cart extends React.Component {
       </Row>
       <Row>
       <Col>
-          <TouchableOpacity  onPress={() => this.ChangeCount(-1,index,item.products[0]._id)}><Text style={{fontFamily:"IRANYekanMobileLight",fontSize:50,textAlign:'center'}}><Ionicons name="ios-arrow-dropdown-circle" style={{ fontSize: 30, color: 'red' }} /></Text></TouchableOpacity>
+          <TouchableOpacity  onPress={() => this.ChangeCount(-1,index,item.product_detail_id)}><Text style={{fontFamily:"IRANYekanMobileLight",fontSize:50,textAlign:'center'}}><Ionicons name="ios-arrow-dropdown-circle" style={{ fontSize: 30, color: 'red' }} /></Text></TouchableOpacity>
       </Col>
     </Row>
   </Grid>

@@ -250,11 +250,21 @@ class Cat extends React.Component {
                     {item.subTitle != '-' &&
                       <Text  style={{fontFamily:'IRANYekanMobileLight',textAlign:'center',marginTop:15,fontSize:12,color:'gray'}}> {item.subTitle} </Text>
                     }
+                    {item.number > 0 ?
+                    <View>
                     {item.off != '0' &&
                         <Text style={{fontFamily:'IRANYekanMobileLight',textAlign:'center',marginTop:15,fontSize:14,color:'#752f2f',textDecorationLine:'line-through'}}>{this.ConvertNumToFarsi(item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))} تومان</Text>
 
                       }
                     <Text style={{fontFamily:'IRANYekanMobileBold',textAlign:'center',marginTop:15,fontSize:16,color:'#752f2f'}}> {this.ConvertNumToFarsi((item.price - ((item.price * item.off)/100)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))} تومان </Text>
+                   </View>
+                   :
+                   <View>
+                      <Text style={{fontFamily: 'IRANYekanMobileBold', textAlign: 'center' }}>ناموجود</Text>
+
+                     </View>
+                
+                    }
                </View>
                 <View   >
                 <Image source={{uri:'https://marketapi.sarvapps.ir/' + item.fileUploaded.split("public")[1]}} style={{height: 80, width: 80}}/>
@@ -284,12 +294,22 @@ class Cat extends React.Component {
                     {item.subTitle != '-' &&
                       <Text  style={{fontFamily:'IRANYekanMobileLight',textAlign:'center',marginTop:15,fontSize:12,color:'gray'}}> {item.subTitle} </Text>
                     }
-                    {item.off != '0' &&
+                    {item.number > 0 ?
+                    <View>
+                      {item.off != '0' &&
                         <Text style={{fontFamily:'IRANYekanMobileLight',textAlign:'center',marginTop:15,fontSize:14,color:'#752f2f',textDecorationLine:'line-through'}}>{this.ConvertNumToFarsi(item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))} تومان</Text>
 
                       }
                     <Text style={{fontFamily:'IRANYekanMobileLight',textAlign:'center',marginTop:15,fontSize:16,color:'#752f2f'}}> {this.ConvertNumToFarsi((item.price - ((item.price * item.off)/100)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","))} تومان </Text>
-               </View>
+               
+                    </View>
+                    :
+                    <View>
+                    <Text style={{ fontFamily: 'IRANYekanMobileBold', textAlign: 'center' }}>ناموجود</Text>
+
+                      </View>
+                  }
+                   </View>
                 <View   >
                 <Image source={{uri:'https://marketapi.sarvapps.ir/' + item.fileUploaded.split("public")[1]}} style={{height: 80, width: 80}}/>
 
