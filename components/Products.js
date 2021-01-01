@@ -238,7 +238,7 @@ class Products extends React.Component {
       })
     }
     let ECallBack = function (error) {
-      alert(error)
+      //alert(error)
     }
 
     this.Server.send("https://marketapi.sarvapps.ir/MainApi/getComment", { ProductId: this.state.id, limit: 5 }, SCallBack, ECallBack)
@@ -262,7 +262,6 @@ class Products extends React.Component {
         visibleLoader: false
       })
       that.getComments();
-      //   alert(that.state.Products.length)      
     }
     let ECallBack = function (error) {
       alert(error)   

@@ -33,7 +33,8 @@ class Cat extends React.Component {
         ServerBusy:false,
         inLoad:true,
         visibleLoader:false,
-        callNew:0
+        callNew:0,
+        InBack:0
     }
     
    
@@ -45,12 +46,31 @@ class Cat extends React.Component {
 
       this.setState({
         callNew:0,
-        id:this.props.route.params.id,
-        CatData:[]
+        id:this.props.route.params.id
       })
-      this.getSubCat(this.props.route.params.id);
+      if(!this.props.route.params.AfterBack){
+        this.getSubCat(this.props.route.params.id);
+
+      }
+    }
+    
+    if(this.props.route.params && this.props.route.params && this.props.route.params.CatData && this.props.route.params.AfterBack){
+      this.setState({
+        InBack:1,
+        Warning:1,
+        GridData:[],
+        CatData:this.props.route.params.CatData
+      })
+      this.props.route.params.AfterBack=null;
+      let that = this;
+      setTimeout(function(){
+        that.setState({
+          InBack:0
+        })
+      },2000)
     }
     if(this.props.route.params && this.props.route.params && this.props.route.params.p=="LoginTrue"){
+
       this.props.route.params.p="a";
       this.setState({
         LoginTrue:true
@@ -59,7 +79,9 @@ class Cat extends React.Component {
     }  
   }
   componentDidMount() { 
+
      if(!this.state.Haraj){
+
       this.getSubCat();
 
      }
@@ -120,21 +142,26 @@ class Cat extends React.Component {
   }
   getSubCat(id){
     let that = this; 
-
       that.setState({     
         visibleLoader:true     
       }) 
     that.Server.send("https://marketapi.sarvapps.ir/MainApi/GetCategory",{CatId:id||that.state.id,getSubCat:1,inMobile:1},function(response){
-              that.setState({     
+          
+    that.setState({     
                 visibleLoader:false
               })  
 
               if(response.data.result.length==0){
+                if(that.state.limit == 6)
+                  that.state.CatData.push([])
                 that.getProducts();
                 return;
               }
+              if(that.state.limit == 6)
+                that.state.CatData.push(response.data.result)
+  
               that.setState({     
-                CatData: response.data.result,
+                CatData: that.state.CatData,
                 Warning:1    
               })   
   
@@ -148,8 +175,10 @@ class Cat extends React.Component {
     }
   getProducts(){
     let that = this;
+
     if(this.state.ServerBusy)
       return;   
+
     if(this.state.LastGridDataFirstId==this.state.GridDataFirstId) 
         return;
     this.setState({
@@ -212,6 +241,7 @@ class Cat extends React.Component {
        
   }
   _handleLoadMore = () => {
+
     if(this.state.inLoad){
       this.setState({
         inLoad:false
@@ -219,10 +249,11 @@ class Cat extends React.Component {
       return;
 
     }
-    this.setState({
-      limit:this.state.limit+5/*,
-      skip:this.state.skip+1  */
-    },this.getProducts())
+    if(!this.state.InBack)
+      this.setState({
+        limit:this.state.limit+5/*,
+        skip:this.state.skip+1  */
+      },this.getProducts())   
     
   };  
   _handleLoadMoreCat = () => {
@@ -233,10 +264,10 @@ class Cat extends React.Component {
       return;
 
     }
-    this.setState({
-      limit:this.state.limit+5/*,
-      skip:this.state.skip+1  */
-    },this.getSubCat())
+    if(!this.state.InBack)
+      this.setState({  
+        limit:this.state.limit+5
+      },this.getSubCat())
     
   }; 
 
@@ -275,7 +306,9 @@ class Cat extends React.Component {
       </TouchableOpacity>
   );
   _renderItemCat = ({item}) => (
-    <TouchableOpacity style={{borderBottomColor:'#eee',borderBottomWidth:1,padding:15}} onPress={() =>{this.setState({callNew:1}); this.props.navigation.navigate('Cat', {id: item._id})}} >
+    <TouchableOpacity style={{borderBottomColor:'#eee',borderBottomWidth:1,padding:15}} onPress={() =>{
+      this.setState({callNew:1,limit:6,GridDataFirstId:"",LastGridDataFirstId:"-",});
+       this.props.navigation.navigate('Cat', {id: item._id})}} >
        <View style={{flex:1,flexDirection:'row',justifyContent:'space-evenly'}}>
                 <View style={{flexBasis:280}}>
                     {item.pic &&
@@ -331,7 +364,7 @@ class Cat extends React.Component {
     <Container >
       <Content>
 
-            <HeaderBox navigation={this.props.navigation} title={(this.props.route && this.props.route.params ) && this.props.route.params.name} goBack={true} />
+            <HeaderBox navigation={this.props.navigation} title={(this.props.route && this.props.route.params ) && this.props.route.params.name} goBack={true} CatData={this.state.CatData} />
             {this.state.Warning ==1 &&
             <View style={{marginTop:10,marginBottom:10,flex:1,flexDirection:'row',height:150,justifyContent:'center',width:'100%',alignContent:'space-between'}}>
               <View style={{flexBasis:'90%'}} >
@@ -347,37 +380,16 @@ class Cat extends React.Component {
               <Text style={{fontFamily:'IRANYekanMobileBold',fontSize:20}}>آیتمی جهت نمایش وجود ندارد</Text>
             </View>
             }
-            {!this.state.Haraj && this.state.CatData.length > 0 && this.state.Warning !=2 &&
+            {!this.state.Haraj && this.state.GridData.length ==0 &&  this.state.CatData.length > 0 && this.state.Warning !=2 &&
             <View>
-               <View style={{backgroundColor:'red',flex:0.1,justifyContent:'center',flexDirection:'row-reverse',height:40,marginTop:50,display:'none'}}>
-                <TouchableOpacity style={styles.Selected}>
-                  <View>
-                    <Text style={{fontFamily:'IRANYekanMobileLight'}}>همه</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.NotSelected}>
-                  <View>
-                    <Text style={{fontFamily:'IRANYekanMobileLight'}}>جدیدترین</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.NotSelected}>
-                  <View>
-                    <Text style={{fontFamily:'IRANYekanMobileLight'}}>پرفروش ترین</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.NotSelected}>
-                  <View>
-                    <Text style={{fontFamily:'IRANYekanMobileLight'}}>ارزانترین</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
+               
               <FlatList
-                    data={this.state.CatData}
+                    data={this.state.CatData[this.state.CatData.length-1]}
                     extraData={this.state}
                     keyExtractor={this._keyExtractor}  
                     onEndReachedThreshold ={0.5}
                     renderItem={this._renderItemCat}    
-                    onEndReached={this._handleLoadMoreCat}
+                    onEndReached={this._handleLoadMoreCat}   
               />
               </View>
               }

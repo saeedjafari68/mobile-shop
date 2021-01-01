@@ -27,12 +27,12 @@ class HeaderBox extends React.Component {
             username:null,
             userId:null,
             name:"",
+            CatData:[],
             CartNumber:0
     } 
     this.findUser = this.findUser.bind(this);
     this.logout = this.logout.bind(this);
     this.refresh = this.refresh.bind(this);
-           
   }  
 
   findUser(){
@@ -65,9 +65,9 @@ class HeaderBox extends React.Component {
   }   
   componentWillReceiveProps(){
     if(this.props.NewCartNumber)
-    this.setState({
-      CartNumber:this.props.NewCartNumber  
-    })
+      this.setState({
+        CartNumber:this.props.NewCartNumber  
+      })
   }
   componentDidUpdate(){
      let that = this;  
@@ -76,6 +76,7 @@ class HeaderBox extends React.Component {
      {
       this.findUser(); 
      } 
+      
   }
   componentDidMount() { 
     this.findUser(); 
@@ -122,7 +123,13 @@ class HeaderBox extends React.Component {
             <View style={{flexBasis:'90%'}}><Text style={{fontFamily:'IRANYekanMobileLight',textAlign:'center',fontSize:20,marginTop:5,color:'#333'}}>{this.props.title}</Text></View>
             <View style={{flexBasis:'10%'}}>
               
-            <TouchableOpacity style={{marginLeft:20,marginTop:5}} onPress={() => { this.props.navigation.goBack()}}  >
+            <TouchableOpacity style={{marginLeft:20,marginTop:5}} onPress={() => {
+
+              if(this.props.CatData && this.props.CatData.length > 0) {
+                this.props.CatData.pop();
+
+              }
+              (!this.props.CatData || (this.props.CatData && this.props.CatData.length <1)) ? this.props.navigation.goBack() : (this.props.navigation.navigate('Cat', {CatData: this.props.CatData,AfterBack:1})) }}  >
             <Icon  name='md-arrow-back' size={30}  style={{color:'#333'}} />
             </TouchableOpacity>
             </View>
